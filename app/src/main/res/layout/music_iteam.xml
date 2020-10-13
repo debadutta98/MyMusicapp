@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#111111"
+    android:layout_marginStart="5dp"
+    android:id="@+id/audio_iteam"
+    android:layout_marginLeft="5dp">
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/music_image"
+        android:src="@mipmap/ic_launcher_round"
+        android:padding="5dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="File name"
+        android:layout_toEndOf="@id/music_image"
+        android:layout_marginStart="10dp"
+        android:layout_centerVertical="true"
+        android:textColor="@color/colorAccent"
+        android:id="@+id/file_name"
+        android:layout_toRightOf="@id/music_image"
+        android:layout_marginLeft="10dp"
+        android:layout_toStartOf="@+id/menu_more"
+        android:layout_toLeftOf="@+id/menu_more" />
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/menu_more"
+        android:src="@drawable/ic_baseline_more"
+        android:layout_alignParentEnd="true"
+        android:padding="10dp"
+        app:tint="@color/colorAccent"
+        android:layout_alignParentRight="true" />
+</RelativeLayout>

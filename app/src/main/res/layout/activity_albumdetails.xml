@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".AlbumDetails">
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:id="@+id/album_photo"
+    android:src="@drawable/mip"
+    android:scaleType="centerCrop"
+    />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:id="@+id/gradient_bg"
+        android:src="@drawable/mip"
+        android:scaleType="centerCrop"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recycleview_layout"
+        android:layout_below="@+id/album_photo"
+        />
+
+</RelativeLayout>
