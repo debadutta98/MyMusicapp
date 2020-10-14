@@ -13,10 +13,15 @@ import java.util.ArrayList;
 
 
 public class MusicService extends Service {
+    public static final String ACTION_PREV="actionprevious";
+    public static final String ACTION_NEXT="actionnext";
+    public static final String ACTION_PLAY="actionplay";
+
     IBinder myBinder =new MyBinder();
     MediaPlayer mediaPlayer;
     ActionPlayer actionPlayer;
     ArrayList<MusicFiles> musicFilesArrayList=new ArrayList<>();
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,6 +39,28 @@ return MusicService.this;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
+        String actionname=intent.getStringExtra("Myaction");
+        if(actionname!=null) {
+            switch (actionname) {
+                case ACTION_PLAY:
+if(actionPlayer!=null)
+    actionPlayer.playbuttonClicked();
+                    break;
+                case ACTION_NEXT:
+                    if(actionPlayer!=null)
+                        actionPlayer.nextbuttonClicked();
+                    break;
+                case ACTION_PREV:
+                    if(actionPlayer!=null)
+                        actionPlayer.prevbuttonClicked();
+                    break;
+            }
+        }
+        return START_STICKY;
     }
+    public void setCallback(ActionPlayer actionPlayer1)
+    {
+this.actionPlayer=actionPlayer1;
+    }
+
 }

@@ -24,7 +24,7 @@
             android:id="@+id/android_name"
             android:layout_alignParentBottom="true"
             android:text="album"
-            android:textColor="#fff"
+            android:textColor="#E91E63"
             android:singleLine="true"
             android:gravity="center_horizontal"
             android:layout_centerHorizontal="true"

@@ -12,13 +12,17 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Switch;
@@ -28,18 +32,21 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity  implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity  implements SearchView.OnQueryTextListener, ServiceConnection {
 static ArrayList<MusicFiles> albums=new ArrayList<>();
     private static final int REQUEST_CODE = 1;
     static boolean shuffle=false,repeat=false;
+    MusicService musicService;
 static ArrayList<MusicFiles> musicFiles;
 private String SORT_ORDER_PREF="SortOrder";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViewPager();
         perMission();
+
     }
 
     private void perMission() {
@@ -82,6 +89,15 @@ private String SORT_ORDER_PREF="SortOrder";
        tabLayout.setupWithViewPager(viewPager);
     }
 
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+
+    }
 
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -214,4 +230,5 @@ SongFragment.musicAdapter.updateALL(mfiles);
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

@@ -1,9 +1,14 @@
 package com.debadutta91.mymusic;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.palette.graphics.Palette;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +19,13 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -34,9 +42,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import static com.debadutta91.mymusic.AlbumDetailsAdapter.albumfiles;
+
+import static com.debadutta91.mymusic.ApplicationClass.CHANNEL_ID_2;
 import static com.debadutta91.mymusic.MainActivity.musicFiles;
 import static com.debadutta91.mymusic.MainActivity.repeat;
 import static com.debadutta91.mymusic.MainActivity.shuffle;
+import static com.debadutta91.mymusic.NotificationReceiver.ACTION_NEXT;
+import static com.debadutta91.mymusic.NotificationReceiver.ACTION_PLAY;
+import static com.debadutta91.mymusic.NotificationReceiver.ACTION_PREV;
 
 
 public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener,ActionPlayer ,ServiceConnection {
@@ -51,12 +64,22 @@ private Handler handler=new Handler();
 static MediaPlayer mediaPlayer;
 static ArrayList<MusicFiles> song=new ArrayList<>();
 private Thread playthread,nextthread,prevthread;
+MediaSessionCompat mediaSession;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         initview();
         getIntentMethod();
+        back_btn=findViewById(R.id.back_btn);
+        back_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(PlayerActivity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
+mediaSession=new MediaSessionCompat(this,"pLAYERAUDIO");
        song_name.setText(song.get(postion).getTitle());
        artist_name.setText(song.get(postion).getArtist());
         mediaPlayer.setOnCompletionListener(this);
@@ -79,6 +102,7 @@ private Thread playthread,nextthread,prevthread;
 
             }
         });
+
         PlayerActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -155,8 +179,7 @@ private Thread playthread,nextthread,prevthread;
         if(song!=null)
         {
            playbutton.setImageResource(R.drawable.ic_baseline_pause);
-            uri=Uri.parse(song.get(postion).getPath());
-
+           uri=Uri.parse(song.get(postion).getPath());
         }
         if(mediaPlayer!=null)
         {
@@ -183,7 +206,7 @@ private Thread playthread,nextthread,prevthread;
         cover_art=findViewById(R.id.cover_art);
         next_btn=findViewById(R.id.next);
         prev_btn=findViewById(R.id.prev);
-        back_btn=findViewById(R.id.back_btn);
+
         shuffle_btn=findViewById(R.id.shuffle);
         repeate_btn=findViewById(R.id.repeat);
         playbutton=findViewById(R.id.play_pause);
@@ -258,6 +281,7 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
         prevThreadButton();
         super.onResume();
 
+
     }
 
     @Override
@@ -315,6 +339,9 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
             mediaPlayer.setOnCompletionListener(this);
             playbutton.setBackgroundColor(R.drawable.ic_baseline_pause);
             mediaPlayer.start();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showNotification(R.drawable.ic_baseline_play_arrow);
+            }
         }
         else
         {
@@ -346,6 +373,9 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
             });
             mediaPlayer.setOnCompletionListener(this);
             playbutton.setBackgroundColor(R.drawable.ic_baseline_pause);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showNotification(R.drawable.ic_baseline_pause);
+            }
         }
     }
 
@@ -368,6 +398,7 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
     public void nextbuttonClicked() {
         if(mediaPlayer.isPlaying())
         {
+
             mediaPlayer.stop();
             mediaPlayer.release();
             if(shuffle && !repeat)
@@ -396,6 +427,9 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
             mediaPlayer.setOnCompletionListener(this);
             playbutton.setBackgroundColor(R.drawable.ic_baseline_pause);
             mediaPlayer.start();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showNotification(R.drawable.ic_baseline_play_arrow);
+            }
         }
         else
         {
@@ -428,6 +462,9 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
             });
             mediaPlayer.setOnCompletionListener(this);
             playbutton.setBackgroundColor(R.drawable.ic_baseline_pause);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showNotification(R.drawable.ic_baseline_pause);
+            }
         }
     }
 
@@ -456,6 +493,7 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
         if(mediaPlayer.isPlaying())
         {
             playbutton.setImageResource(R.drawable.ic_baseline_play_arrow);
+
             mediaPlayer.pause();
             seekBar.setMax(mediaPlayer.getDuration()/1000);
             PlayerActivity.this.runOnUiThread(new Runnable() {
@@ -470,10 +508,14 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
                     handler.postDelayed(this,1000);
                 }
             });
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showNotification(R.drawable.ic_baseline_play_arrow);
+            }
         }
         else
         {
             playbutton.setImageResource(R.drawable.ic_baseline_pause);
+
             mediaPlayer.start();
             seekBar.setMax(mediaPlayer.getDuration()/1000);
             PlayerActivity.this.runOnUiThread(new Runnable() {
@@ -488,6 +530,9 @@ ImageView imageView=findViewById(R.id.imageviewgradient);
                     handler.postDelayed(this,1000);
                 }
             });
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                showNotification(R.drawable.ic_baseline_pause);
+            }
         }
     }
     public  void ImageAnimation(final Context context, final ImageView imageView, final Bitmap bitmap)
@@ -546,11 +591,49 @@ imageView.startAnimation(animation_in);
     public void onServiceConnected(ComponentName name, IBinder service) {
         MusicService.MyBinder myBinder= (MusicService.MyBinder)service;
         musicService=myBinder.getService();
-        Toast.makeText(this,"connected"+musicService,Toast.LENGTH_SHORT).show();
+
+        musicService.setCallback(PlayerActivity.this);
+       // Toast.makeText(this,"connected"+musicService,Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
 musicService=null;
     }
+
+    public void  showNotification(int playPausebtn)
+    {
+        Toast.makeText(this,"play",Toast.LENGTH_SHORT).show();
+        Intent intent=new Intent(this,MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent=PendingIntent.getActivity(this,0,intent,0);
+        Intent prevIntent=new Intent(this, NotificationReceiver.class).setAction("actionprevious");
+        PendingIntent pendingIntent1=PendingIntent.getActivity(this,0,prevIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent1=new Intent(this,NotificationReceiver.class).setAction(ACTION_PLAY);
+        PendingIntent pendingIntent2=PendingIntent.getActivity(this,0,intent1,0);
+        Intent nextIntent=new Intent(this, NotificationReceiver.class).setAction(ACTION_NEXT);
+        PendingIntent pendingIntent3=PendingIntent.getActivity(this,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        Bitmap bitmap=BitmapFactory.decodeResource(getResources(),R.drawable.mip);
+
+
+
+        Notification noti = new NotificationCompat.Builder(this,CHANNEL_ID_2)
+        .setOnlyAlertOnce(true)
+                .setContentIntent(pendingIntent)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setSmallIcon(R.drawable.mip)
+                    .setLargeIcon(bitmap)
+                    .setContentTitle(MusicAdapter.musicFiles.get(postion).getTitle())
+                    .setContentText(MusicAdapter.musicFiles.get(postion).getArtist())
+                    .addAction(R.drawable.ic_baseline_skip_previous,"Prev",pendingIntent1)
+                    .addAction(playPausebtn,"play",pendingIntent2)
+                .addAction(R.drawable.ic_baseline_skip_next,"next",pendingIntent3)
+                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                            .setMediaSession(mediaSession.getSessionToken()))
+                                    .build();
+NotificationManager notificationManager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+notificationManager.notify(0,noti);
+
+    }
+
 }

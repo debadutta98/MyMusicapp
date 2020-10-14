@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        app:tabIndicatorColor="@color/colorAccent"
+        app:tabIndicatorColor="#CC1E59"
         app:tabIndicatorFullWidth="true"
         app:tabIndicatorGravity="center"
         app:tabIndicatorHeight="40dp"
